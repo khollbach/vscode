@@ -286,6 +286,11 @@ const registry = Registry.as<IConfigurationRegistry>(ConfigurationExtensions.Con
 				'default': true,
 				'description': localize('centeredLayoutAutoResize', "Controls if the centered layout should automatically resize to maximum width when more than one group is open. Once only one group is open it will resize back to the original centered width.")
 			},
+			'workbench.editor.centeredLayoutAutoResizeSmallWindow': {
+				'type': 'boolean',
+				'default': false,
+				'description': localize('centeredLayoutAutoResizeSmallWindow', 'Controls whether the centered layout should automatically resize to maximum width whenever the window is "small" (at most 60% screen width). Once the window occupies more than half the screen, the centered layout returns to its original width.')
+			},
 			'workbench.editor.centeredLayoutFixedWidth': {
 				'type': 'boolean',
 				'default': false,

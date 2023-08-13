@@ -271,6 +271,9 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 
 			// Revalidate center layout when active editor changes: diff editor quits centered mode.
 			this._register(this.editorService.onDidActiveEditorChange(() => this.centerEditorLayout(this.stateModel.getRuntimeValue(LayoutStateKeys.EDITOR_CENTERED))));
+
+			// Revalidate centered layout when the window size changes.
+			this._register(this.editorGroupService.onDidLayout(() => this.centerEditorLayout(this.stateModel.getRuntimeValue(LayoutStateKeys.EDITOR_CENTERED))));
 		});
 
 		// Configuration changes
@@ -281,6 +284,8 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				LegacyWorkbenchLayoutSettings.STATUSBAR_VISIBLE,
 				'window.menuBarVisibility',
 				'window.titleBarStyle',
+				'workbench.editor.centeredLayoutAutoResize',
+				'workbench.editor.centeredLayoutAutoResizeSmallWindow',
 			].some(setting => e.affectsConfiguration(setting))) {
 				this.doUpdateLayoutConfiguration();
 			}
@@ -1421,6 +1426,17 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			(this.editorGroupService.groups.length > 1 || isEditorComplex)
 		) {
 			active = false; // disable centered layout for complex editors or when there is more than one group
+		}
+
+		if (this.configurationService.getValue('workbench.editor.centeredLayoutAutoResizeSmallWindow')) {
+			// Get the window width in physical pixels, to compare to the physical screen.
+			const windowWidth = this.dimension.width * window.devicePixelRatio;
+			const isSmallWindow = windowWidth / screen.width < .6;
+
+			if (isSmallWindow) {
+				// Suppress centered layout.
+				active = false;
+			}
 		}
 
 		if (this.editorGroupService.isLayoutCentered() !== active) {
